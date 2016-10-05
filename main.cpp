@@ -15,6 +15,7 @@ typedef struct{
 
 TDigraph * Init(int V);
 TDigraph * insert(TDigraph *D, int v, int w);
+void verifyCycle(TDigraph *D, int v, int *marked);
 
 int main(){
 
@@ -27,11 +28,12 @@ int main(){
     insert(digraph, 1, 4);
     insert(digraph, 2, 3);
     insert(digraph, 3, 5);
+    insert(digraph, 3, 2); //forms cycle
     insert(digraph, 3, 6);
     insert(digraph, 4, 5);
-    insert(digraph, 6, 6);
+    insert(digraph, 6, 6); //same vertex
     insert(digraph, 5, 6);
-    insert(digraph, 5, 6);
+    insert(digraph, 5, 6); //same arc
 
 }
 
@@ -50,6 +52,8 @@ TDigraph * Init(int V){
 
 
 TDigraph * insert(TDigraph *D, int v, int w){
+    int *marked = (int*) calloc(D->V, sizeof(int)), index;
+
     TNode *newN, *prev, *node;
 
     prev = NULL;
@@ -67,19 +71,42 @@ TDigraph * insert(TDigraph *D, int v, int w){
         printf("Arc (%d,%d) already inserted\n", v, w);
 
     } else{
-        newN = (TNode*) calloc(1, sizeof(TNode));
-        newN->w = w;
-        newN->next = node;
 
-        if(!prev){
-            D->adj[v] = newN;
-        }else{
-            prev->next = newN;
+        for(index = 0; index < D->V; index++)
+            marked[index] = 0;
+
+        verifyCycle(D, w, marked);
+
+        if(marked[v]){
+            printf("Arc (%d,%d) forms cycle\n", v, w);
+        }else {
+            newN = (TNode *) calloc(1, sizeof(TNode));
+            newN->w = w;
+            newN->next = node;
+
+            if (!prev) {
+                D->adj[v] = newN;
+            } else {
+                prev->next = newN;
+            }
+            D->A++;
         }
-        D->A++;
     }
-    printf("\n");
-
     return D;
 }
+
+void verifyCycle(TDigraph *D, int v, int *marked){
+    marked[v] = 1;
+
+    TNode *vertex;
+    vertex = D->adj[v];
+
+    while(vertex){
+        if(!marked[vertex->w]){
+            verifyCycle(D, vertex->w, marked);
+        }
+        vertex = vertex->next;
+    }
+}
+
 
