@@ -12,16 +12,20 @@ typedef struct{
     TNode **adj;
 }TDigraph;
 
-
+int size;
 TDigraph * Init(int V);
 TDigraph * insert(TDigraph *D, int v, int w);
 void verifyCycle(TDigraph *D, int v, int *marked);
 void printDigraph(TDigraph *D);
+void topologicalSort(TDigraph *D);
+void depthFirstSearch(TDigraph *D, int v, int *marked, int *sorting);
+void printTopologicalSort(int *sort, int size);
 
 int main(){
 
+    size = 7;
     TDigraph *digraph;
-    digraph = Init(7);
+    digraph = Init(size);
 
     insert(digraph, 0, 1);
     insert(digraph, 0, 2);
@@ -37,6 +41,8 @@ int main(){
     insert(digraph, 5, 6); //same arc
 
     printDigraph(digraph);
+
+    topologicalSort(digraph);
 
 }
 
@@ -127,3 +133,42 @@ void printDigraph(TDigraph *D){
     printf("\n");
 }
 
+void topologicalSort(TDigraph *D){
+    int *marked, *sort, v;
+    marked = (int*) calloc(D->V, sizeof(int));
+    sort = (int*) calloc(D->V, sizeof(int));
+
+    for(v = 1; v < D->V; v++){
+        if(!marked[v]){
+            depthFirstSearch(D, v, marked, sort);
+        }
+    }
+}
+
+void depthFirstSearch(TDigraph *D, int v, int *marked, int *sort){
+    marked[v] = 1;
+
+    TNode *vertex;
+    vertex = D->adj[v];
+
+    while(vertex){
+        if(!marked[vertex->w]){
+            depthFirstSearch(D, vertex->w, marked, sort);
+        }
+        vertex = vertex->next;
+    }
+
+    sort[--size] = v;
+
+    if(size == 1)
+        printTopologicalSort(sort, D->V);
+
+}
+
+void printTopologicalSort(int *sort, int size){
+    int index;
+
+    for(index = 0; index < size; index++){
+        printf("%d ", sort[index]);
+    }
+}
