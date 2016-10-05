@@ -16,6 +16,7 @@ typedef struct{
 TDigraph * Init(int V);
 TDigraph * insert(TDigraph *D, int v, int w);
 void verifyCycle(TDigraph *D, int v, int *marked);
+void printDigraph(TDigraph *D);
 
 int main(){
 
@@ -34,6 +35,8 @@ int main(){
     insert(digraph, 6, 6); //same vertex
     insert(digraph, 5, 6);
     insert(digraph, 5, 6); //same arc
+
+    printDigraph(digraph);
 
 }
 
@@ -109,4 +112,18 @@ void verifyCycle(TDigraph *D, int v, int *marked){
     }
 }
 
+void printDigraph(TDigraph *D){
+    int index;
+    for(index = 0; index < D->V; index++){
+        TNode *vertex = D->adj[index];
+        printf("%d ->", index);
+
+        while(vertex){
+            printf(" %d", vertex->w);
+            vertex = vertex->next;
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
 
