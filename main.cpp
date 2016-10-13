@@ -23,6 +23,7 @@ void printTopologicalSort(int *sort, int size);
 FILE * readFile();
 int tasksNumber();
 void insertTasks(TDigraph *D);
+void tasksName(int taskNumber);
 
 int main(){
 
@@ -65,10 +66,10 @@ TDigraph * insert(TDigraph *D, int v, int w){
     }
 
     if(v == w){
-        printf("v(%d) and w(%d) must be different\n", v , w);
+        printf("Tasks must be different\n", v , w);
 
     } else if(node && node->w == w){
-        printf("Arc (%d,%d) already inserted\n", v, w);
+        printf("(%d,%d) already inserted\n", v, w);
 
     } else{
 
@@ -78,7 +79,7 @@ TDigraph * insert(TDigraph *D, int v, int w){
         verifyCycle(D, w, marked);
 
         if(marked[v]){
-            printf("Arc (%d,%d) forms cycle\n", v, w);
+            printf("(%d,%d) forms cycle\n", v, w);
         }else {
             newN = (TNode *) calloc(1, sizeof(TNode));
             newN->w = w;
@@ -160,7 +161,8 @@ void printTopologicalSort(int *sort, int size){
     int index;
 
     for(index = 0; index < size; index++){
-        printf("%d ", sort[index]);
+        printf("%d: ", index+1);
+        tasksName(sort[index]+1);
     }
 }
 
@@ -210,4 +212,20 @@ void insertTasks(TDigraph *D){
     }
     else
         printf("Error, file not found");
+}
+
+void tasksName(int taskNumber){
+    FILE *file;
+    file = readFile();
+
+    int count = 0;
+    char line[50];
+
+    while(fgets(line, sizeof(line), file) != NULL){
+        if(count == taskNumber){
+            printf("%s", line);
+        }
+        count++;
+    }
+    fclose(file);
 }
