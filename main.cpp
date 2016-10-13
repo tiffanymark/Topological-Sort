@@ -20,32 +20,24 @@ void printDigraph(TDigraph *D);
 void topologicalSort(TDigraph *D);
 void depthFirstSearch(TDigraph *D, int v, int *marked, int *sorting);
 void printTopologicalSort(int *sort, int size);
+FILE * readFile();
+int tasksNumber();
+void insertTasks(TDigraph *D);
 
 int main(){
 
-    size = 7;
+    size = tasksNumber();
+
     TDigraph *digraph;
     digraph = Init(size);
 
-    insert(digraph, 0, 1);
-    insert(digraph, 0, 2);
-    insert(digraph, 1, 2);
-    insert(digraph, 1, 4);
-    insert(digraph, 2, 3);
-    insert(digraph, 3, 5);
-    insert(digraph, 3, 2); //forms cycle
-    insert(digraph, 3, 6);
-    insert(digraph, 4, 5);
-    insert(digraph, 6, 6); //same vertex
-    insert(digraph, 5, 6);
-    insert(digraph, 5, 6); //same arc
+    insertTasks(digraph);
 
     printDigraph(digraph);
 
     topologicalSort(digraph);
 
 }
-
 
 TDigraph * Init(int V){
     TDigraph *D;
@@ -58,7 +50,6 @@ TDigraph * Init(int V){
 
     return D;
 }
-
 
 TDigraph * insert(TDigraph *D, int v, int w){
     int *marked = (int*) calloc(D->V, sizeof(int)), index;
@@ -171,4 +162,52 @@ void printTopologicalSort(int *sort, int size){
     for(index = 0; index < size; index++){
         printf("%d ", sort[index]);
     }
+}
+
+FILE * readFile(){
+    FILE *file;
+    file = fopen("D:\\Repository\\Topological-Sort\\tasks.txt", "r");
+
+    if(file)
+        return file;
+
+    return NULL;
+}
+
+int tasksNumber(){
+    FILE *file = readFile();
+
+    if(file) {
+        int number;
+
+        fscanf(file, "%d", &number);
+
+        fclose(file);
+
+        return number;
+    }
+    else
+        return 0;
+}
+
+void insertTasks(TDigraph *D){
+    FILE *file = readFile();
+
+    if(file) {
+        char line[50];
+        int tasks, count = 0, v, w;
+
+        tasks = tasksNumber();
+
+        while (fgets(line, sizeof(line), file) != NULL) {
+            if (count > tasks) {
+                fscanf(file, "%d %d", &v, &w);
+                insert(D, v, w);
+            }
+            count++;
+        }
+        fclose(file);
+    }
+    else
+        printf("Error, file not found");
 }
